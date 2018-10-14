@@ -24,7 +24,7 @@ REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repoda
 MOCKCFGS+=fedora-28-x86_64.cfg
 MOCKCFGS+=epel-7-x86_64.cfg
 
-all:: $(CFGS)
+all:: $(CFGS) $(MOCKCFGS)
 all:: $(REPODIRS)
 all:: $(PY2PACKPKGS)
 
