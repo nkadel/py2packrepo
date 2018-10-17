@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        0.8.3
-Release:        0%{?dist}
+Release:        0.1%{?dist}
 Summary:        Tool to collect metadata about a python module
 Group:          Development/Languages/Python
 
@@ -53,6 +53,8 @@ metaextract is a tool to collect metadata about a python module.
 %prep
 %autosetup -n %{srcname}-%{version}
 
+# Reset default to fedora.spec
+sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 
 %build
 %py2_build
@@ -92,6 +94,9 @@ metaextract is a tool to collect metadata about a python module.
 %endif
 
 %changelog
+* Wed Oct 17 2018  Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.1
+- Set default template to fedora.spec
+
 * Sat Oct 6 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0
 - Initial import
 - Add with-python for RHEL 7
