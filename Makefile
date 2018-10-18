@@ -13,14 +13,15 @@ PY2PACKPKGS+=python-py2pack-srpm
 
 REPOS+=py2packrepo/el/7
 REPOS+=py2packrepo/fedora/28
+REPOS+=py2packrepo/fedora/29
 
 REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repodata,$(REPOS))
 
 # No local dependencies at build time
-CFGS+=py2packrepo-f28-x86_64.cfg
 CFGS+=py2packrepo-7-x86_64.cfg
 
 # Link from /etc/mock
+MOCKCFGS+=fedora-29-x86_64.cfg
 MOCKCFGS+=fedora-28-x86_64.cfg
 MOCKCFGS+=epel-7-x86_64.cfg
 
