@@ -1,7 +1,9 @@
-include('/etc/mock/epel-7-x86_64.cfg')
-
 config_opts['root'] = 'py2packrepo-7-x86_64'
-#config_opts['package_manager'] = 'yum'
+config_opts['target_arch'] = 'x86_64'
+config_opts['legal_host_arches'] = ('x86_64',)
+config_opts['chroot_setup_cmd'] = 'install @buildsys-build'
+config_opts['dist'] = 'el7'  # only useful for --resultdir variable subst
+config_opts['releasever'] = '7'
 
 config_opts['yum.conf'] = """
 [main]
@@ -94,5 +96,4 @@ name=py2packrepo
 enabled=1
 baseurl=file://@REPOBASEDIR@/py2packrepo/el/7/x86_64/
 failovermethod=priority
-cost=2000
 """
