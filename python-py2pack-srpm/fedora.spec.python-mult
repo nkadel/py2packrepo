@@ -108,20 +108,17 @@ Suggests:       python3-{{ req|replace('(','')|replace(')','') }}
 %{?python_provide:%python_provide python2-%{srcname}}
 %endif # with_python3
 
-%global _description \
-{{ description }}
-	
 %description
-%{_description}
+{{ description }}
 
 %if 0%{with_python2}
 %description -n python2-{{ name }}
-%{_description}
+{{ description }}
 %endif # with_python2
 
 %if 0%{with_python3}
 %description -n python3-{{ name }}
-%{_description}
+{{ description }}
 %endif # with_python3
 
 %prep
