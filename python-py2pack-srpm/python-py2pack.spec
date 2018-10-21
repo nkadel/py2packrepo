@@ -46,14 +46,11 @@ BuildRequires:  python3-pbr >= 1.0
 %endif # with_python3
 BuildArch:      noarch
 
-%global %{_description} \
+%description
 This script allows to generate RPM spec or DEB dsc files from Python modules.
 It allows to list Python modules or search for them on the Python Package Index
 (PyPI). Conveniently, it can fetch tarballs and changelogs making it an
 universal tool to package Python modules.
-
-%description
-%{_description}
 
 %if 0%{with_python2}
 %package -n python2-py2pack
@@ -62,7 +59,10 @@ Requires:  python2-metaextract
 %{?python_provide:%python_provide python2-py2pack}
 
 %description -n python2-py2pack
-%{_description}
+This script allows to generate RPM spec or DEB dsc files from Python modules.
+It allows to list Python modules or search for them on the Python Package Index
+(PyPI). Conveniently, it can fetch tarballs and changelogs making it an
+universal tool to package Python modules.
 %endif # with_python2
 
 %if 0%{with_python3}
@@ -72,7 +72,10 @@ Requires:  python3-metaextract
 %{?python_provide:%python_provide python3-py2pack}
 
 %description -n python3-py2pack
-%{_description}
+This script allows to generate RPM spec or DEB dsc files from Python modules.
+It allows to list Python modules or search for them on the Python Package Index
+(PyPI). Conveniently, it can fetch tarballs and changelogs making it an
+universal tool to package Python modules.
 %endif
 
 %prep
@@ -116,7 +119,7 @@ sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 %{python2_sitelib}/*
 %{_bindir}/py2pack2
 %if ! 0%{with_python3}
-%{_bindir}/py2pack2
+%{_bindir}/py2pack
 %endif # ! with_python3
 %endif # with_python2
 
