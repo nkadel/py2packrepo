@@ -135,6 +135,7 @@ sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 %changelog
 * Sun Oct 21 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.4
 - Update handling of python3 and provides in fedora.spec
+- Add python-setuptools dependencies to fedora.spec
 
 * Wed Oct 17 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.1
 - Set default template to fedora.spec
