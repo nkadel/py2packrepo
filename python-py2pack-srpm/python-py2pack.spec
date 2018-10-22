@@ -22,7 +22,7 @@
 
 Name:           python-py2pack
 Version:        0.8.3
-Release:        0.4%{?dist}
+Release:        0.5%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
@@ -133,6 +133,9 @@ sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 %endif # with_python3
 
 %changelog
+* Mon Oct 22 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.5
+- Add "dist" to Release field in fedora.epc
+
 * Sun Oct 21 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.4
 - Update handling of python3 and provides in fedora.spec
 - Add python-setuptools dependencies to fedora.spec
