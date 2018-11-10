@@ -22,7 +22,7 @@
 
 Name:           python-py2pack
 Version:        0.8.3
-Release:        0.5%{?dist}
+Release:        0.6%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
@@ -56,6 +56,7 @@ universal tool to package Python modules.
 %package -n python2-py2pack
 Summary:        %{summary}
 Requires:  python2-metaextract
+Requires:  python2-jinja2
 %{?python_provide:%python_provide python2-py2pack}
 
 %description -n python2-py2pack
@@ -69,6 +70,7 @@ universal tool to package Python modules.
 %package -n python3-py2pack
 Summary:        %{summary}
 Requires:  python3-metaextract
+Requires:  python3-jinja2
 %{?python_provide:%python_provide python3-py2pack}
 
 %description -n python3-py2pack
@@ -133,6 +135,10 @@ sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 %endif # with_python3
 
 %changelog
+* Sat Nov 10 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.6
+- Use BuildRequires "python-" instead of "python2-" for RHEL, to avoid EPEL dependencies
+- Add Requires python-jinja2
+
 * Mon Oct 22 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.5
 - Add "dist" to Release field in fedora.epc
 
