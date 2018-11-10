@@ -19,6 +19,8 @@ REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repoda
 
 # No local dependencies at build time
 CFGS+=py2packrepo-7-x86_64.cfg
+CFGS+=py2packrepo-f28-x86_64.cfg
+CFGS+=py2packrepo-f29-x86_64.cfg
 
 # Link from /etc/mock
 MOCKCFGS+=fedora-29-x86_64.cfg

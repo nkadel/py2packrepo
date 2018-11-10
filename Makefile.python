@@ -11,11 +11,13 @@ RSYNCOPTS=-a --no-owner --no-group
 RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing 
 
 # "mock" configurations to build with, activate only as needed
-MOCKS+=fedora-29-x86_64
-MOCKS+=fedora-28-x86_64
+#MOCKS+=fedora-29-x86_64
+#MOCKS+=fedora-28-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 #MOCKS+=epel-7-x86_64
 MOCKS+=py2packrepo-7-x86_64
+MOCKS+=py2packrepo-f28-x86_64
+MOCKS+=py2packrepo-f29-x86_64
 
 # Local yum compatible RPM repository
 REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
