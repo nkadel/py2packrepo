@@ -12,19 +12,16 @@ PY2PACKPKGS+=python-metaextract-srpm
 PY2PACKPKGS+=python-py2pack-srpm
 
 REPOS+=py2packrepo/el/7
-REPOS+=py2packrepo/fedora/28
 REPOS+=py2packrepo/fedora/29
 
 REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repodata,$(REPOS))
 
 # No local dependencies at build time
 CFGS+=py2packrepo-7-x86_64.cfg
-CFGS+=py2packrepo-f28-x86_64.cfg
 CFGS+=py2packrepo-f29-x86_64.cfg
 
 # Link from /etc/mock
 MOCKCFGS+=fedora-29-x86_64.cfg
-MOCKCFGS+=fedora-28-x86_64.cfg
 MOCKCFGS+=epel-7-x86_64.cfg
 
 all:: $(CFGS) $(MOCKCFGS)
@@ -62,11 +59,47 @@ $(REPODIRS): $(REPOS)
 .PHONY: cfg cfgs
 cfg cfgs:: $(CFGS) $(MOCKCFGS)
 
-$(CFGS)::
-	sed 's|@REPOBASEDIR@|$(PWD)|g' $@.in > $@
+py2packrepo-7-x86_64.cfg: epel-7-x86_64.cfg
+	@echo Generating $@ from $?
+	@cat $? > $@
+	@sed -i 's/epel-7-x86_64/py2packrepo-7-x86_64/g' $@
+	@echo '"""' >> $@
+	@echo >> $@
+	@echo '[py2packrepo]' >> $@
+	@echo 'name=py2packrepo' >> $@
+	@echo 'enabled=1' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/el/7/x86_64/' >> $@
+	@echo 'failovermethod=priority' >> $@
+	@echo 'skip_if_unavailable=False' >> $@
+	@echo 'metadata_expire=1' >> $@
+	@echo 'gpgcheck=0' >> $@
+	@echo '#cost=2000' >> $@
+	@echo '"""' >> $@
+	@uniq -u $@ > $@~
+	@mv $@~ $@
+
+py2packrepo-f29-x86_64.cfg: fedora-29-x86_64.cfg
+	@echo Generating $@ from $?
+	@cat $? > $@
+	@sed -i 's/fedora-29-x86_64/py2packrepo-f29-x86_64/g' $@
+	@echo '"""' >> $@
+	@echo >> $@
+	@echo '[py2packrepo]' >> $@
+	@echo 'name=py2packrepo' >> $@
+	@echo 'enabled=1' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/29/x86_64/' >> $@
+	@echo 'failovermethod=priority' >> $@
+	@echo 'skip_if_unavailable=False' >> $@
+	@echo 'metadata_expire=1' >> $@
+	@echo 'gpgcheck=0' >> $@
+	@echo '#cost=2000' >> $@
+	@echo '"""' >> $@
+	@uniq -u $@ > $@~
+	@mv $@~ $@
+
 
 $(MOCKCFGS)::
-	ln -sf /etc/mock/$@ $@
+	ln -sf --no-dereference /etc/mock/$@ $@
 
 repo: py2packrepo.repo
 py2packrepo.repo:: py2packrepo.repo.in
@@ -90,4 +123,3 @@ maintainer-clean:
 	rm -rf $(PY2PACKPKGS)
 
 FORCE::
-
