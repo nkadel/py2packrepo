@@ -1,14 +1,13 @@
 %global srcname metaextract
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+# Single python3 version in Fedora, python3_pkgversion macro not available
+%{!?python3_pkgversion:%global python3_pkgversion 3}
+
 %global with_python3 1
-%else
-%global with_python3 0
-%endif
 
 Name:           python-%{srcname}
 Version:        1.0.4
-Release:        0%{?dist}
+Release:        0.1%{?dist}
 Summary:        Tool to collect metadata about a python module
 
 License:        BSD
@@ -23,7 +22,6 @@ know it's dependencies. metaextract can collect theses dependencies.
 The tool was first developed in `py2pack`_ but is now it's own module to be
 useful for others, too.
 
-
 %package -n python2-%{srcname}
 Summary:        %{summary}
 # Test requirements
@@ -37,14 +35,14 @@ metaextract is a tool to collect metadata about a python module.
 
 
 %if 0%{?with_python3}
-%package -n python3-%{srcname}
+%package -n python%{python3_pkgversion}-%{srcname}
 Summary:        %{summary}
 # Test requirements
-BuildRequires:  python3-devel
-BuildRequires:  python3-pytest-runner
-%{?python_provide:%python_provide python3-%{srcname}}
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-pytest-runner
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
-%description -n python3-%{srcname}
+%description -n python%{python3_pkgversion}-%{srcname}
 metaextract is a tool to collect metadata about a python module. 
 %endif
 
@@ -83,7 +81,7 @@ metaextract is a tool to collect metadata about a python module.
 
 
 %if 0%{?with_python3}
-%files -n python3-%{srcname}
+%files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
@@ -92,6 +90,9 @@ metaextract is a tool to collect metadata about a python module.
 %endif
 
 %changelog
+* Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 1.0.4-0.1
+- Activate with_python3
+
 * Sat Oct 6 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 1.0.4-0
 - Initial import
 - Add BuildRequires for pytest-runner
