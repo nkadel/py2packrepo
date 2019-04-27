@@ -4,16 +4,15 @@
 # Copyright (c) {{ year }} {{ user_name }}.
 #
 
-# Fedora and RHEL split python2 and python3
-# Older RHEL does not include python3 by default
-%if 0%{?fedora} || 0%{?rhel} > 7
-%global with_python3 1
-%else
-%global with_python3 0
-%endif
+# Single python3 version in Fedora, python3_pkgversion macro for EPEL in older RHEL
+%{!?python3_pkgversion:%global python3_pkgversion 3}
 
-# Fedora > 28 no longer publishes python2 by default
-%if 0%{?fedora} > 28
+# Fedora and RHEL split python2 and python3
+# Older RHEL requires EPEL and python34 or python36
+%global with_python3 1
+
+# Fedora > 30 no longer publishes python2 by default
+%if 0%{?fedora} > 30
 %global with_python2 0
 %else
 %global with_python2 1
@@ -40,14 +39,8 @@ BuildArch:      noarch
 {%- endif %}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if 0%{with_python2}
-%if 0%{?rhel}
-# Use non-specific names for RHEL
-BuildRequires:  python-devel
-BuildRequires:  python-setuptools
-%else
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
-%endif # rhel
 {%- for req in requires %}
 BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
