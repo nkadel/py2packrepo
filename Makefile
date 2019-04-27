@@ -21,6 +21,7 @@ CFGS+=py2packrepo-7-x86_64.cfg
 CFGS+=py2packrepo-f29-x86_64.cfg
 
 # Link from /etc/mock
+MOCKCFGS+=fedora-rawhide-x86_64.cfg
 MOCKCFGS+=fedora-29-x86_64.cfg
 MOCKCFGS+=epel-7-x86_64.cfg
 
