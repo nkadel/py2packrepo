@@ -11,9 +11,11 @@ RSYNCOPTS=-a --no-owner --no-group
 RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing 
 
 # "mock" configurations to build with, activate only as needed
-MOCKS+=fedora-29-x86_64
-MOCKS+=fedora-28-x86_64
+# Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=epel-7-x86_64
+
+# Touch these to update repositories
+#MOCKCFGS+=py2packrepo-7-x86_64
 
 # Local yum compatible RPM repository
 REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
@@ -22,22 +24,14 @@ REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
 SPEC := `ls *.spec | head -1`
 PKGNAME := "`ls *.spec | head -1 | sed 's/.spec$$//g'`"
 
-all:: verifyspec
 # Needed for yum repo updates
 all:: /usr/bin/createrepo
 all:: $(MOCKS)
 
-# Oddness to get deduced .spec file verified
-verifyspec:: FORCE
-	@if [ ! -e $(SPEC) ]; then \
-	    echo Error: SPEC file $(SPEC) not found, exiting; \
-	    exit 1; \
-	fi
-
 # Needed for correct srpm and build format
 #build srpm:: /etc/rpm/macros.python27-config
 
-srpm:: verifyspec FORCE
+srpm:: FORCE
 	@echo "Building $(SPEC) SRPM"
 	rm -rf rpmbuild
 	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
@@ -49,20 +43,15 @@ build:: srpm FORCE
 	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
 		--rebuild rpmbuild/SRPMS/*.src.rpm
 
-$(MOCKS):: verifyspec FORCE
+$(MOCKS):: srpm FORCE
 	@if [ -n "`find $@ -name \*.rpm ! -name \*.src.rpm 2>/dev/null`" ]; then \
 		echo "	Skipping $(SPEC) in $@ with RPMS"; \
 	else \
-		echo "	Building $@ SRPM with $(SPEC)"; \
-		rm -rf $@; \
-		mock -r $(PWD)/../$@.cfg \
-		    --resultdir=$(PWD)/$@ \
-		    --sources=$(PWD) --buildsrpm --spec=$(SPEC); \
-		echo "Storing $@/*.src.rpm in $@.src.rpm"; \
-		/bin/mv $@/*.src.rpm $@.src.rpm; \
+		echo "Storing " rpmbuild/SRPMS/*.src.rpm "as $@.src.rpm"; \
+		install rpmbuild/SRPMS/*.src.rpm $@.src.rpm; \
 		echo "Building $@.src.rpm in $@"; \
 		rm -rf $@; \
-		mock -r $(PWD)/../$@.cfg \
+		mock -q -r $(PWD)/../$@.cfg \
 		    --resultdir=$(PWD)/$@ \
 		    $@.src.rpm; \
 	fi
@@ -90,17 +79,12 @@ install:: $(MOCKS)
 	    createrepo -q --update $$rpmdir/.; \
 	done
 
-# Do not use this for EPEL based builds
-#	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
-#	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
-#
-
-
 clean::
 	rm -rf $(MOCKS)
 	rm -rf rpmbuild
+	rm -rf */
+	rm -f *.rpm
 
 realclean distclean:: clean
-	rm -f *.src.rpm
 
 FORCE:
