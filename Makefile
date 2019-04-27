@@ -102,11 +102,19 @@ $(MOCKCFGS)::
 	ln -sf --no-dereference /etc/mock/$@ $@
 
 repo: py2packrepo.repo
-py2packrepo.repo:: py2packrepo.repo.in
-	sed 's|@REPOBASEDIR@|$(PWD)|g' $@.in > $@
-py2packrepo.repo::
-	@cmp -s $@ /etc/yum.repos.d/$@ || \
-	    diff -u $@ /etc/yum.repos.d/$@
+py2packrepo.repo:: Makefile py2packrepo.repo.in
+	if [ -s /etc/fedora-release ]; then \
+		cat $@.in | \
+			sed "s|@REPOBASEDIR@/|$(PWD)/|g" | \
+			sed "s|/@RELEASEDIR@/|/fedora/|g" > $@; \
+	elif [ -s /etc/redhat-release ]; then \
+		cat $@.in | \
+			sed "s|@REPOBASEDIR@/|$(PWD)/|g" | \
+			sed "s|/@RELEASEDIR@/|/el/|g" > $@; \
+	else \
+		echo Error: unknown release, check /etc/*-release; \
+		exit 1; \
+	fi
 
 clean::
 	find . -name \*~ -exec rm -f {} \;
