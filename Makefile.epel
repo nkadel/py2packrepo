@@ -13,7 +13,11 @@ RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing
 # "mock" configurations to build with, activate only as needed
 MOCKS+=fedora-30-x86_64
 MOCKS+=fedora-29-x86_64
+# Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=epel-7-x86_64
+
+# Touch these to update repositories
+#MOCKCFGS+=py2packrepo-7-x86_64
 
 # Local yum compatible RPM repository
 REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
@@ -39,16 +43,16 @@ build:: srpm FORCE
 		--rebuild rpmbuild/SRPMS/*.src.rpm
 
 $(MOCKS):: srpm FORCE
-	@if [ -e $@ -a -n "`find $@ -name \*.rpm`" ]; then \
-		echo "	Skipping RPM populated $@"; \
+	@if [ -n "`find $@ -name \*.rpm ! -name \*.src.rpm 2>/dev/null`" ]; then \
+		echo "	Skipping $(SPEC) in $@ with RPMS"; \
 	else \
-		echo "Storing as $@.src.rpm"; \
+		echo "Storing " rpmbuild/SRPMS/*.src.rpm "as $@.src.rpm"; \
 		install rpmbuild/SRPMS/*.src.rpm $@.src.rpm; \
-		echo "Actally building RPMS in $@"; \
+		echo "Building $@.src.rpm in $@"; \
 		rm -rf $@; \
 		mock -q -r $(PWD)/../$@.cfg \
-		     --resultdir=$(PWD)/$@ \
-		     $@.src.rpm; \
+		    --resultdir=$(PWD)/$@ \
+		    $@.src.rpm; \
 	fi
 
 mock:: $(MOCKS)
@@ -74,17 +78,12 @@ install:: $(MOCKS)
 	    createrepo -q --update $$rpmdir/.; \
 	done
 
-# Do not use this for EPEL based builds
-#	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
-#	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
-#
-
-
 clean::
 	rm -rf $(MOCKS)
 	rm -rf rpmbuild
+	rm -rf */
+	rm -f *.rpm
 
 realclean distclean:: clean
-	rm -f *.src.rpm
 
 FORCE:

@@ -6,14 +6,14 @@
 %global with_python3 1
 
 %if ((0%{?fedora} < 30) && (0%{?rhel} < 8))
-%global with_python2 0
-%else
 %global with_python2 1
+%else
+%global with_python2 0
 %endif
 
 Name:           python-%{pypi_name}
 Version:        1.0.4
-Release:        0%{?dist}
+Release:        0.1%{?dist}
 Summary:        Tool to collect metadata about a python module
 
 License:        BSD

@@ -65,9 +65,6 @@ $(REPODIRS): $(REPOS)
 .PHONY: cfg cfgs
 cfg cfgs:: $(CFGS) $(MOCKCFGS)
 
-$(MOCKCFGS)::
-	ln -sf /etc/mock/$@ $@
-
 py2packrepo-7-x86_64.cfg: epel-7-x86_64.cfg
 	@echo Generating $@ from $?
 	@cat $? > $@
@@ -77,62 +74,54 @@ py2packrepo-7-x86_64.cfg: epel-7-x86_64.cfg
 	@echo '[py2packrepo]' >> $@
 	@echo 'name=py2packrepo' >> $@
 	@echo 'enabled=1' >> $@
-	@echo 'baseurl=$(REPOBASE)/py2packrepo/el/7/x86_64/' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/el/7/x86_64/' >> $@
 	@echo 'failovermethod=priority' >> $@
 	@echo 'skip_if_unavailable=False' >> $@
-	@echo 'metadata_expire=3' >> $@
+	@echo 'metadata_expire=1' >> $@
 	@echo 'gpgcheck=0' >> $@
 	@echo '#cost=2000' >> $@
 	@echo '"""' >> $@
-	@uniq -u $@ > $@.out
-	@mv $@.out $@
+	@uniq -u $@ > $@~
+	@mv $@~ $@
 
 py2packrepo-f29-x86_64.cfg: fedora-29-x86_64.cfg
 	@echo Generating $@ from $?
 	@cat $? > $@
-	@sed -i 's/fedora-29-x86_64/py2packrepo-29-x86_64/g' $@
+	@sed -i 's/fedora-29-x86_64/py2packrepo-f29-x86_64/g' $@
 	@echo '"""' >> $@
 	@echo >> $@
 	@echo '[py2packrepo]' >> $@
 	@echo 'name=py2packrepo' >> $@
 	@echo 'enabled=1' >> $@
-	@echo 'baseurl=$(REPOBASE)/py2packrepo/fedora/29/x86_64/' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/29/x86_64/' >> $@
 	@echo 'failovermethod=priority' >> $@
 	@echo 'skip_if_unavailable=False' >> $@
-	@echo 'metadata_expire=3' >> $@
+	@echo 'metadata_expire=1' >> $@
 	@echo 'gpgcheck=0' >> $@
 	@echo '#cost=2000' >> $@
 	@echo '"""' >> $@
-	@uniq -u $@ > $@.out
-	@mv $@.out $@
+	@uniq -u $@ > $@~
+	@mv $@~ $@
 
-py2packrepo-f30-x86_64.cfg: fedora-30-x86_64.cfg
-	@echo Generating $@ from $?
-	@cat $? > $@
-	@sed -i 's/fedora-30-x86_64/py2packrepo-30-x86_64/g' $@
-	@echo '"""' >> $@
-	@echo >> $@
-	@echo '[py2packrepo]' >> $@
-	@echo 'name=py2packrepo' >> $@
-	@echo 'enabled=1' >> $@
-	@echo 'baseurl=$(REPOBASE)/py2packrepo/fedora/30/x86_64/' >> $@
-	@echo 'failovermethod=priority' >> $@
-	@echo 'skip_if_unavailable=False' >> $@
-	@echo 'metadata_expire=3' >> $@
-	@echo 'gpgcheck=0' >> $@
-	@echo '#cost=2000' >> $@
-	@echo '"""' >> $@
-	@uniq -u $@ > $@.out
-	@mv $@.out $@
 
+$(MOCKCFGS)::
+	ln -sf --no-dereference /etc/mock/$@ $@
 
 
 repo: py2packrepo.repo
-py2packrepo.repo:: py2packrepo.repo.in
-	sed 's|@REPOBASEDIR@|$(PWD)|g' $@.in > $@
-py2packrepo.repo::
-	@cmp -s $@ /etc/yum.repos.d/$@ || \
-	    diff -u $@ /etc/yum.repos.d/$@
+py2packrepo.repo:: Makefile py2packrepo.repo.in
+	if [ -s /etc/fedora-release ]; then \
+		cat $@.in | \
+			sed "s|@REPOBASEDIR@/|$(PWD)/|g" | \
+			sed "s|/@RELEASEDIR@/|/fedora/|g" > $@; \
+	elif [ -s /etc/redhat-release ]; then \
+		cat $@.in | \
+			sed "s|@REPOBASEDIR@/|$(PWD)/|g" | \
+			sed "s|/@RELEASEDIR@/|/el/|g" > $@; \
+	else \
+		echo Error: unknown release, check /etc/*-release; \
+		exit 1; \
+	fi
 
 clean::
 	find . -name \*~ -exec rm -f {} \;
@@ -149,4 +138,3 @@ maintainer-clean:
 	rm -rf $(PY2PACKPKGS)
 
 FORCE::
-
