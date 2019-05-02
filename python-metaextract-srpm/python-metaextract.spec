@@ -1,4 +1,4 @@
-%global srcname metaextract
+%global pypi_name metaextract
 
 %if 0%{?fedora} || 0%{?rhel} > 7
 %global with_python3 1
@@ -6,13 +6,13 @@
 %global with_python3 0
 %endif
 
-Name:           python-%{srcname}
+Name:           python-%{pypi_name}
 Version:        1.0.4
 Release:        0%{?dist}
 Summary:        Tool to collect metadata about a python module
 
 License:        BSD
-Source:         http://pypi.python.org/packages/source/m/%{srcname}-%{version}.tar.gz
+Source:         http://pypi.python.org/packages/source/m/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -24,32 +24,32 @@ The tool was first developed in `py2pack`_ but is now it's own module to be
 useful for others, too.
 
 
-%package -n python2-%{srcname}
+%package -n python2-%{pypi_name}
 Summary:        %{summary}
 # Test requirements
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
 BuildRequires:  python2-pytest-runner
-%{?python_provide:%python_provide python2-%{srcname}}
+%{?python_provide:%python_provide python2-%{pypi_name}}
 
-%description -n python2-%{srcname}
+%description -n python2-%{pypi_name}
 metaextract is a tool to collect metadata about a python module. 
 
 
 %if 0%{?with_python3}
-%package -n python3-%{srcname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
 # Test requirements
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest-runner
-%{?python_provide:%python_provide python3-%{srcname}}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 
-%description -n python3-%{srcname}
+%description -n python3-%{pypi_name}
 metaextract is a tool to collect metadata about a python module. 
 %endif
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{pypi_name}-%{version}
 
 
 %build
@@ -75,7 +75,7 @@ metaextract is a tool to collect metadata about a python module.
 # release, tests should be enabled.
 
 
-%files -n python2-%{srcname}
+%files -n python2-%{pypi_name}
 %license LICENSE
 %doc README.rst
 %{python2_sitelib}/*
@@ -83,7 +83,7 @@ metaextract is a tool to collect metadata about a python module.
 
 
 %if 0%{?with_python3}
-%files -n python3-%{srcname}
+%files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
