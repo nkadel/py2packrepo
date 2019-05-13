@@ -60,7 +60,7 @@ $(REPOS):
 .PHONY: $(REPODIRS)
 $(REPODIRS): $(REPOS)
 	@install -d -m 755 `dirname $@`
-	/usr/bin/createrepo `dirname $@`
+	/usr/bin/createrepo -q `dirname $@`
 
 
 .PHONY: cfg cfgs
