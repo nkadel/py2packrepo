@@ -18,14 +18,16 @@
 %global with_dnf 0
 %endif
 
-Name:           python-py2pack
-Version:        0.8.3
-Release:        0.6%{?dist}
+%global pypi_name py2pack
+
+Name:           python-%{pypi_name}
+Version:        0.8.4
+Release:        0%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
 License:        BSD
-Source:         http://pypi.python.org/packages/source/m/py2pack-%{version}.tar.gz
+Source:         https://pypi.io/packages/source/p/%{pypi_name}-%{version}.tar.gz
 Source1:        fedora.spec.python-mult
 
 %if %{with_python2}
@@ -50,13 +52,13 @@ It allows to list Python modules or search for them on the Python Package Index
 universal tool to package Python modules.
 
 %if %{with_python2}
-%package -n python2-py2pack
+%package -n python2-%{pypi_name}
 Summary:        %{summary}
 Requires:  python2-metaextract
 Requires:  python2-jinja2
-%{?python_provide:%python_provide python2-py2pack}
+%{?python_provide:%python_provide python2-%{pypi_name}}
 
-%description -n python2-py2pack
+%description -n python2-%{pypi_name}
 This script allows to generate RPM spec or DEB dsc files from Python modules.
 It allows to list Python modules or search for them on the Python Package Index
 (PyPI). Conveniently, it can fetch tarballs and changelogs making it an
@@ -64,16 +66,16 @@ universal tool to package Python modules.
 %endif # with_python2
 
 %if %{with_python3}
-%package -n python%{python3_pkgversion}-py2pack
+%package -n python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
 Requires:  python%{python3_pkgversion}-metaextract
 Requires:  python%{python3_pkgversion}-jinja2
-%{?python_provide:%python_provide python%{python3_pkgversion}-py2pack}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 %if ! %{with_python2}
-Obsoletes: python2-py2pack < %{version}-%{release}
+Obsoletes: python2-%{pypi_name} < %{version}-%{release}
 %endif
 
-%description -n python%{python3_pkgversion}-py2pack
+%description -n python%{python3_pkgversion}-%{pypi_name}
 This script allows to generate RPM spec or DEB dsc files from Python modules.
 It allows to list Python modules or search for them on the Python Package Index
 (PyPI). Conveniently, it can fetch tarballs and changelogs making it an
@@ -81,7 +83,7 @@ universal tool to package Python modules.
 %endif
 
 %prep
-%autosetup -n py2pack-%{version}
+%autosetup -n %{pypi_name}-%{version}
 %{__install} -m0644 %{SOURCE1} py2pack/templates/fedora.spec
 
 # Reset default to fedora.spec
@@ -130,7 +132,7 @@ popd
 # release, tests should be enabled.
 
 %if %{with_python2}
-%files -n python2-py2pack
+%files -n python2-%{pypi_name}
 %license LICENSE
 %doc README.rst
 %{python2_sitelib}/*
@@ -141,7 +143,7 @@ popd
 %endif # with_python2
 
 %if %{with_python3}
-%files -n python%{python3_pkgversion}-py2pack
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
@@ -150,6 +152,10 @@ popd
 %endif # with_python3
 
 %changelog
+* Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0
+- Update to 0.8.4
+- Use pypi_name consistently, as embedded variable, in fedora.spec.python-mult
+
 * Sat Apr 27 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.6
 - Update fedora.spec.python-mult with latest py2pack values for Fedora > 30
 - Disable python2 building

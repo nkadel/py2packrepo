@@ -25,8 +25,10 @@
 %global with_dnf 0
 %endif
 
+%global pypi_name {{ name }}
+
 # Common SRPM package
-Name:           python-{{ name }}
+Name:           python-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -60,7 +62,7 @@ BuildRequires:  python3-{{ req|replace('(','')|replace(')','') }}
 %endif # with_python3
 
 %if 0%{with_python2}
-%package -n python2-{{ name }}
+%package -n python2-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -81,11 +83,11 @@ Suggests:       python20{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python2-{{ name }}}
+%{?python_provide:%python_provide python2-%{pypi_name}}
 %endif # with_python2
 
 %if 0%{with_python3}
-%package -n python3-{{ name }}
+%package -n python3-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -106,24 +108,24 @@ Suggests:       python3-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python3-{{ name }}}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 %endif # with_python3
 
 %description
 {{ description }}
 
 %if 0%{with_python2}
-%description -n python2-{{ name }}
+%description -n python2-%{pypi_name}
 {{ description }}
 %endif # with_python2
 
 %if 0%{with_python3}
-%description -n python3-{{ name }}
+%description -n python3-%{pypi_name}
 {{ description }}
 %endif # with_python3
 
 %prep
-%setup -q -n {{ name }}-%{version}
+%setup -q -n %{pypi_name}-%{version}
 
 %build
 {%- if is_extension %}
@@ -161,7 +163,7 @@ export CFLAGS="%{optflags}"
 rm -rf %{buildroot}
 
 %if 0%{with_python2}
-%files -n python2-{{ name }}
+%files -n python2-%{pypi_name}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
@@ -184,7 +186,7 @@ rm -rf %{buildroot}
 %endif # with_python2
 
 %if 0%{with_python3}
-%files -n python3-{{ name }}
+%files -n python3-%{pypi_name}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
