@@ -74,15 +74,15 @@ Requires:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- for req in install_requires %}
 Requires:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
-%if 0%{with_dnf}
 {%- if extras_require %}
+%if 0%{with_dnf}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
-Suggests:       python20{{ req|replace('(','')|replace(')','') }}
+Suggests:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
-{%- endif %}
 %endif # with_dnf
+{%- endif %}
 %{?python_provide:%python_provide python2-%{pypi_name}}
 %endif # with_python2
 
@@ -141,22 +141,27 @@ export CFLAGS="%{optflags}"
 %install
 %if 0%{with_python2}
 %py2_install
+{%- if scripts %}
 {%- for script in scripts %}
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/${script} $RPM_BUILD_ROOT%{_bindir}/${script}2
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
+
 %if ! 0%{with_python3}
-{%- for script in scripts %}
-%{__ln_s} ${script}2 $RPM_BUILD_ROOT%{_bindir}/${script}
+%{%- for script in scripts %}
+%{__ln_s} {{ script }}-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
 %endif # ! with_python3
 %endif # with_python2
+{%- endif %}
 %if 0%{with_python3}
 
 %py3_install
+{%- if scripts %}
 {%- for script in scripts %}
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/${script} $RPM_BUILD_ROOT%{_bindir}/${script}3
-%{__ln_s} ${script}3 $RPM_BUILD_ROOT%{_bindir}/${script}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python3_version}
+%{__ln_s} {{ script }}-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 %endif # with_python3
 
 %clean
@@ -168,15 +173,19 @@ rm -rf %{buildroot}
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
+{%- if scripts %}
 {%- for script in scripts %}
-%{_bindir}/{{ script }}2
+%{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
+{%- endif %}
 {%- if is_extension %}
 %if ! 0%{with_python3}
-# Symlinks for binaries renamed to ${script}2, only if with_python3 is not enabled
+# Symlinks for binaries renamed to script-2, only if with_python3 is not enabled
+{%- if scripts %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 %endif # with_python3
 %{python2_archlib}/*
 {%- endif %}
@@ -191,12 +200,14 @@ rm -rf %{buildroot}
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
+{%- if scripts %}
 {%- for script in scripts %}
-%{_bindir}/{{ script }}3
+%{_bindir}/{{ script }}-%{python3_version}
 {%- endfor %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 {%- if is_extension %}
 %{python3_archlib}/*
 {%- endif %}
