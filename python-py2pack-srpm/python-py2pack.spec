@@ -3,26 +3,13 @@
 
 # Fedora and RHEL split python2 and python3
 %global with_python3 1
-
-# Fedora > 28 no longer publishes python2 by default
-%if 0%{?fedora} > 29
 %global with_python2 0
-%else
-%global with_python2 1
-%endif
-
-# Older RHEL does not use dnf, does not support "Suggests"
-%if 0%{?fedora} || 0%{?rhel} > 7
-%global with_dnf 1
-%else
-%global with_dnf 0
-%endif
 
 %global pypi_name py2pack
 
 Name:           python-%{pypi_name}
 Version:        0.8.4
-Release:        0%{?dist}
+Release:        0.1%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
@@ -110,21 +97,21 @@ popd
 %if %{with_python3}
 pushd %{py3dir}
 %py3_install
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/py2pack $RPM_BUILD_ROOT%{_bindir}/py2pack-%{py3_version}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/py2pack $RPM_BUILD_ROOT%{_bindir}/py2pack-%{python3_version}
 popd
 %endif # with_python3
 
 %if %{with_python2}
 %py2_install
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/py2pack $RPM_BUILD_ROOT%{_bindir}/py2pack-%{py2_version}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/py2pack $RPM_BUILD_ROOT%{_bindir}/py2pack-%{python2_version}
 %endif # with_python2
 
 # Make symlinks only after all install steps are completed
 %if %{with_python3}
-%{__ln_s} -f py2pack-%{py3_version} $RPM_BUILD_ROOT%{_bindir}/py2pack
+%{__ln_s} -f py2pack-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/py2pack
 %endif
 %if %{with_python2}
-%{__ln_s} -f py2pack-%{py3_version} $RPM_BUILD_ROOT%{_bindir}/py2pack
+%{__ln_s} -f py2pack-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/py2pack
 %endif
 
 # Upstream does not provide tests with 0.1.0, although
@@ -136,7 +123,7 @@ popd
 %license LICENSE
 %doc README.rst
 %{python2_sitelib}/*
-%{_bindir}/py2pack-%{py2_version}
+%{_bindir}/py2pack-%{python2_version}
 %if ! %{with_python3}
 %{_bindir}/py2pack
 %endif # ! with_python3
@@ -147,11 +134,15 @@ popd
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/*
-%{_bindir}/py2pack-%{py3_version}
+%{_bindir}/py2pack-%{python3_version}
 %{_bindir}/py2pack
 %endif # with_python3
 
 %changelog
+* Wed May 22 2919 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0.1
+- Use with_dnf and scripts only if values are set
+- Use python2_version and python3_version correctly
+
 * Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0
 - Update to 0.8.4
 - Use pypi_name consistently, as embedded variable, in fedora.spec.python-mult
