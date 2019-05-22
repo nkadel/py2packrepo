@@ -4,15 +4,15 @@
 # Copyright (c) {{ year }} {{ user_name }}.
 #
 
-# Single python3 version in Fedora, python3_pkgversion macro for EPEL in older RHEL
+# python3_pkgversion macro for EPEL in older RHEL
 %{!?python3_pkgversion:%global python3_pkgversion 3}
 
 # Fedora and RHEL split python2 and python3
 # Older RHEL requires EPEL and python34 or python36
 %global with_python3 1
 
-# Fedora > 30 no longer publishes python2 by default
-%if 0%{?fedora} > 30
+# Fedora >= 38 no longer publishes python2 by default
+%if 0%{?fedora} >= 30
 %global with_python2 0
 %else
 %global with_python2 1
@@ -51,13 +51,13 @@ BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %endif # with_python2
 %if 0%{with_python3}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 {%- for req in requires %}
-BuildRequires:  python3-{{ req|replace('(','')|replace(')','') }}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- for req in install_requires %}
-BuildRequires:  python3-{{ req|replace('(','')|replace(')','') }}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %endif # with_python3
 
@@ -87,28 +87,28 @@ Suggests:       python2-{{ req|replace('(','')|replace(')','') }}
 %endif # with_python2
 
 %if 0%{with_python3}
-%package -n python3-%{pypi_name}
+%package -n python%{python3_pkgversion}-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
 {%- for req in requires %}
-Requires:       python3-{{ req|replace('(','')|replace(')','') }}
+Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- for req in install_requires %}
-Requires:       python3-{{ req|replace('(','')|replace(')','') }}
+Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if 0%{with_dnf}
 {%- if extras_require %}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
-Suggests:       python3-{{ req|replace('(','')|replace(')','') }}
+Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python3-%{pypi_name}}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 %endif # with_python3
 
 %description
@@ -120,7 +120,7 @@ Suggests:       python3-{{ req|replace('(','')|replace(')','') }}
 %endif # with_python2
 
 %if 0%{with_python3}
-%description -n python3-%{pypi_name}
+%description -n python%{python3_pkgversion}-%{pypi_name}
 {{ description }}
 %endif # with_python3
 
@@ -134,6 +134,7 @@ export CFLAGS="%{optflags}"
 %if 0%{with_python2}
 %py2_build
 %endif # with_python2
+
 %if 0%{with_python3}
 %py3_build
 %endif # with_python3
@@ -147,14 +148,14 @@ export CFLAGS="%{optflags}"
 {%- endfor %}
 
 %if ! 0%{with_python3}
-%{%- for script in scripts %}
+{%- for script in scripts %}
 %{__ln_s} {{ script }}-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
 %endif # ! with_python3
-%endif # with_python2
 {%- endif %}
-%if 0%{with_python3}
+%endif # with_python2
 
+%if 0%{with_python3}
 %py3_install
 {%- if scripts %}
 {%- for script in scripts %}
@@ -179,9 +180,10 @@ rm -rf %{buildroot}
 {%- endfor %}
 {%- endif %}
 {%- if is_extension %}
+
 %if ! 0%{with_python3}
-# Symlinks for binaries renamed to script-2, only if with_python3 is not enabled
 {%- if scripts %}
+# Symlinks for binaries to script-2, only if with_python3 is not enabled
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
@@ -195,7 +197,7 @@ rm -rf %{buildroot}
 %endif # with_python2
 
 %if 0%{with_python3}
-%files -n python3-%{pypi_name}
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
