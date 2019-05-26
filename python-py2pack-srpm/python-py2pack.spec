@@ -139,7 +139,7 @@ popd
 %endif # with_python3
 
 %changelog
-* Wed May 22 2919 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0.1
+* Wed May 22 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0.1
 - Use with_dnf and scripts only if values are set
 - Use python2_version and python3_version correctly
 
