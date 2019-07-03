@@ -13,13 +13,13 @@
 %endif
 
 Name:           python-py2pack
-Version:        0.8.3
-Release:        0.6%{?dist}
+Version:        0.8.4
+Release:        0%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
 License:        BSD
-Source:         http://pypi.python.org/packages/source/m/py2pack-%{version}.tar.gz
+Source:         https://files.pythonhosted.org/packages/source/p/py2pack/py2pack-%{version}.tar.gz
 Source1:        fedora.spec.python-mult
 
 %if %{with_python2}
@@ -129,6 +129,11 @@ sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
 %endif # with_python3
 
 %changelog
+* Wed Jul 3 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0
+- Update to 0.8.4
+- Improve python3_pkgversion handling in fedora.spec template
+- Update Source URL
+
 * Sat Apr 27 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.3-0.6
 - Update fedora.spec.python-mult with latest py2pack values for Fedora > 30
 - Disable python2 building
