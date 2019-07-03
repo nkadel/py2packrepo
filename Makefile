@@ -29,7 +29,7 @@ all:: $(CFGS) $(MOCKCFGS)
 all:: $(REPODIRS)
 all:: $(PY2PACKPKGS)
 
-all install clean:: FORCE
+all getsrc install clean:: FORCE
 	@for name in $(PY2PACKPKGS); do \
 	     (cd $$name; $(MAKE) $(MFLAGS) $@); \
 	done  
