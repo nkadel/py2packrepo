@@ -49,13 +49,13 @@ BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %endif # with_python2
 %if 0%{with_python3}
-BuildRequires:  python%{python3_pkgverson}-devel
-BuildRequires:  python%{python3_pkgverson}-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 {%- for req in requires %}
-BuildRequires:  python%{python3_pkgverson}-{{ req|replace('(','')|replace(')','') }}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- for req in install_requires %}
-BuildRequires:  python%{python3_pkgverson}-{{ req|replace('(','')|replace(')','') }}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %endif # with_python3
 
@@ -85,28 +85,28 @@ Suggests:       python20{{ req|replace('(','')|replace(')','') }}
 %endif # with_python2
 
 %if 0%{with_python3}
-%package -n python%{python3_pkgverson}-{{ name }}
+%package -n python%{python3_pkgversion}-{{ name }}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
 {%- for req in requires %}
-Requires:       python%{python3_pkgverson}-{{ req|replace('(','')|replace(')','') }}
+Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- for req in install_requires %}
-Requires:       python%{python3_pkgverson}-{{ req|replace('(','')|replace(')','') }}
+Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if 0%{with_dnf}
 {%- if extras_require %}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
-Suggests:       python%{python3_pkgverson}-{{ req|replace('(','')|replace(')','') }}
+Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python%{python3_pkgverson}-{{ name }}}
+%{?python_provide:%python_provide python%{python3_pkgversion}-{{ name }}}
 %endif # with_python3
 
 %description
@@ -118,7 +118,7 @@ Suggests:       python%{python3_pkgverson}-{{ req|replace('(','')|replace(')',''
 %endif # with_python2
 
 %if 0%{with_python3}
-%description -n python%{python3_pkgverson}-{{ name }}
+%description -n python%{python3_pkgversion}-{{ name }}
 {{ description }}
 %endif # with_python3
 
@@ -184,7 +184,7 @@ rm -rf %{buildroot}
 %endif # with_python2
 
 %if 0%{with_python3}
-%files -n python%{python3_pkgverson}-{{ name }}
+%files -n python%{python3_pkgversion}-{{ name }}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
