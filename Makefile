@@ -12,17 +12,17 @@ PY2PACKPKGS+=python-metaextract-srpm
 PY2PACKPKGS+=python-py2pack-srpm
 
 REPOS+=py2packrepo/el/7
-REPOS+=py2packrepo/fedora/29
+REPOS+=py2packrepo/fedora/30
 
 REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repodata,$(REPOS))
 
 # No local dependencies at build time
 CFGS+=py2packrepo-7-x86_64.cfg
-CFGS+=py2packrepo-f29-x86_64.cfg
+CFGS+=py2packrepo-f30-x86_64.cfg
 
 # Link from /etc/mock
 MOCKCFGS+=fedora-rawhide-x86_64.cfg
-MOCKCFGS+=fedora-29-x86_64.cfg
+MOCKCFGS+=fedora-30-x86_64.cfg
 MOCKCFGS+=epel-7-x86_64.cfg
 
 all:: $(CFGS) $(MOCKCFGS)
@@ -79,16 +79,16 @@ py2packrepo-7-x86_64.cfg: epel-7-x86_64.cfg
 	@uniq -u $@ > $@~
 	@mv $@~ $@
 
-py2packrepo-f29-x86_64.cfg: fedora-29-x86_64.cfg
+py2packrepo-f30-x86_64.cfg: fedora-30-x86_64.cfg
 	@echo Generating $@ from $?
 	@cat $? > $@
-	@sed -i 's/fedora-29-x86_64/py2packrepo-f29-x86_64/g' $@
+	@sed -i 's/fedora-30-x86_64/py2packrepo-f30-x86_64/g' $@
 	@echo '"""' >> $@
 	@echo >> $@
 	@echo '[py2packrepo]' >> $@
 	@echo 'name=py2packrepo' >> $@
 	@echo 'enabled=1' >> $@
-	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/29/x86_64/' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/30/x86_64/' >> $@
 	@echo 'failovermethod=priority' >> $@
 	@echo 'skip_if_unavailable=False' >> $@
 	@echo 'metadata_expire=1' >> $@
