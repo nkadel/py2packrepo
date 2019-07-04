@@ -20,7 +20,8 @@ Group:          Development/Languages/Python
 
 License:        BSD
 Source:         https://files.pythonhosted.org/packages/source/p/py2pack/py2pack-%{version}.tar.gz
-Source1:        fedora.spec.python-mult
+Source1:        fedora.spec.in
+Source2:        rh-python36.spec.in
 
 %if %{with_python2}
 # Test requirements
@@ -77,6 +78,7 @@ universal tool to package Python modules.
 %prep
 %autosetup -n py2pack-%{version}
 %{__install} -m0644 %{SOURCE1} py2pack/templates/fedora.spec
+%{__install} -m0644 %{SOURCE2} py2pack/templates/rh-python36.spec
 
 # Reset default to fedora.spec
 sed -i.fedora "s/'opensuse.spec'/'fedora.spec'/g" py2pack/__init__.py
