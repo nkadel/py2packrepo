@@ -31,7 +31,7 @@ Source:         {{ source_url|replace(version, '%{version}') }}
 BuildArch:      noarch
 {%- endif %}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-%if 0%{with_python3}
+%if %{with_python3}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 {%- for req in requires %}
@@ -42,7 +42,7 @@ BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- endfor %}
 %endif # with_python3
 
-%if 0%{with_python3}
+%if %{with_python3}
 %package -n python%{python3_pkgversion}-{{ name }}
 Version:        {{ version }}
 Release:        0%{?dist}
@@ -55,7 +55,7 @@ Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- for req in install_requires %}
 Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
-%if 0%{with_dnf}
+%if %{with_dnf}
 {%- if extras_require %}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
@@ -70,7 +70,7 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 %description
 {{ description }}
 
-%if 0%{with_python3}
+%if %{with_python3}
 %description -n python%{python3_pkgversion}-{{ name }}
 {{ description }}
 %endif # with_python3
@@ -82,7 +82,7 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- if is_extension %}
 export CFLAGS="%{optflags}"
 {%- endif %}
-%if 0%{with_python3}
+%if %{with_python3}
 %py3_build
 %endif # with_python3
 
@@ -97,7 +97,7 @@ export CFLAGS="%{optflags}"
 %clean
 rm -rf %{buildroot}
 
-%if 0%{with_python3}
+%if %{with_python3}
 %files -n python%{python3_pkgversion}-{{ name }}
 %defattr(-,root,root,-)
 {%- if doc_files %}
