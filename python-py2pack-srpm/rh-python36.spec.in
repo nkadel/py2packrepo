@@ -32,7 +32,6 @@ Source0:        https://files.pythonhosted.org/packages/source/%(n={{ name }}; e
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if %{with_python3}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
@@ -84,22 +83,14 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- if is_extension %}
 export CFLAGS="%{optflags}"
 {%- endif %}
-%if %{with_python3}
 %py3_build
-%endif # with_python3
 
 %install
 %py3_install
-{%- for script in scripts %}
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/${script} $RPM_BUILD_ROOT%{_bindir}/${script}3
-%{__ln_s} ${script}3 $RPM_BUILD_ROOT%{_bindir}/${script}
-{%- endfor %}
-%endif # with_python3
 
 %clean
 rm -rf %{buildroot}
 
-%if %{with_python3}
 %files -n python%{python3_pkgversion}-{{ name }}
 %defattr(-,root,root,-)
 {%- if doc_files %}
@@ -117,6 +108,5 @@ rm -rf %{buildroot}
 {%- if not is_extension %}
 %{python3_sitelib}/*
 {%- endif %}
-%endif # with_python3
 
 %changelog

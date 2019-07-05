@@ -41,7 +41,6 @@ Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name};
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %if %{with_python2}
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
