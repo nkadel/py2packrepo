@@ -42,13 +42,12 @@ License:        {{ license }}
 Group:          Development/Languages/Python
 # Stop using py2pack macros, use local macros published by Fedora
 Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name}; echo ${n:0:1})/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
 
 %description
-%blobal common_description
+{{ description }}
 
 %if %{with_python2}
 %package -n python2-%{pypi_name}
@@ -60,10 +59,14 @@ License:        {{ license }}
 
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
+# requires stanza of py2pack
+{%- for req in requires %}
+BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
+Requires:       python2-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+# install_requires stanza of py2pack
 {%- for req in install_requires %}
 BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-{%- for req in requires %}
 Requires:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
@@ -76,6 +79,10 @@ Suggests:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endif %}
 %endif # with_dnf
 %{?python_provide:%python_provide python2-%{pypi_name}}
+
+%description -n python2-%{pypi_name}
+{{ description }}
+
 %endif # with_python2
 
 %if %{with_python3}
@@ -86,10 +93,14 @@ Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
 
+# requires stanza of py2pack
+{%- for req in requires %}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+# install_requires stanza of py2pack
 {%- for req in install_requires %}
 BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-{%- for req in requires %}
 Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
@@ -102,16 +113,10 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- endif %}
 %endif # with_dnf
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
-%endif # with_python3
 
-%if %{with_python2}
-%description -n python2-%{pypi_name}
-%{common_description}
-%endif # with_python2
-
-%if %{with_python3}
 %description -n python%{python3_pkgversion}-%{pypi_name}
-%{common_description}
+{{ description }}
+
 %endif # with_python3
 
 %prep
@@ -136,6 +141,7 @@ export CFLAGS="%{optflags}"
 {%- for script in scripts %}
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
+
 %if ! %{with_python3}
 {%- for script in scripts %}
 %{__ln_s} {{ script }}-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
@@ -165,6 +171,7 @@ rm -rf %{buildroot}
 %{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
 {%- if is_extension %}
+
 %if ! %{with_python3}
 # Symlinks for binaries to script-2, only if with_python3 is not enabled
 {%- for script in scripts %}
