@@ -1,15 +1,11 @@
 #
-# spec file for package python-{{ name }}
+# spec file for package rh-python36-python-{{ name }}
 #
 # Copyright (c) {{ year }} {{ user_name }}.
 #
 
-# Single python3 version in Fedora, python3_pkgversion macro for EPEL in older RHEL
-%{!?python3_pkgversion:%global python3_pkgversion 3}
-
-# Fedora and RHEL split python2 and python3
-# Older RHEL requires EPEL and python34 or python36
-%global with_python3 1
+%{?scl:%scl_package python-six}
+%{!?scl:%global pkg_name %{name}}
 
 # Older RHEL does not use dnf, does not support "Suggests"
 %if 0%{?fedora} || 0%{?rhel} > 7
@@ -18,8 +14,15 @@
 %global with_dnf 0
 %endif
 
+%global pypi_name {{ name }}
+
+# Descriptions can get long and clutter .spec file
+%global common_description %{expand:
+{{ description }}
+}
+
 # Common SRPM package
-Name:           python-{{ name }}
+Name:           %{?scl_prefix}python-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -27,77 +30,59 @@ Summary:        {{ summary }}
 License:        {{ license }}
 Group:          Development/Languages/Python
 # Stop using py2pack macros, use local macros published by Fedora
-Source0:        https://files.pythonhosted.org/packages/source/%(n={{ name }}; echo ${n:0:1})/{{ name }}/{{ name }}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name}; echo ${n:0:1})/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
-%if %{with_python3}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-{%- for req in requires %}
-BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
+BuildRequires:  %{?scl_prefix}python-devel
+BuildRequires:  %{?scl_prefix}python-setuptools
 {%- for req in install_requires %}
-BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+BuildRequires:  %{?scl_prefix}python-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
-%endif # with_python3
-
-%if %{with_python3}
-%package -n python%{python3_pkgversion}-{{ name }}
-Version:        {{ version }}
-Release:        0%{?dist}
-Url:            {{ home_page }}
-Summary:        {{ summary }}
-License:        {{ license }}
 {%- for req in requires %}
-Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-{%- for req in install_requires %}
-Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+Requires:       %{?scl_prefix}python-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
 {%- if extras_require %}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
-Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+Suggests:       %{?scl_prefix}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python%{python3_pkgversion}-{{ name }}}
-%endif # with_python3
+%{?python_provide:%python_provide python-%{pypi_name}}
 
 %description
-{{ description }}
-
-%if %{with_python3}
-%description -n python%{python3_pkgversion}-{{ name }}
-{{ description }}
-%endif # with_python3
+%blobal common_description
 
 %prep
-%setup -q -n {{ name }}-%{version}
+%setup -q -n %{pypi_name}-%{version}
 
 %build
 {%- if is_extension %}
 export CFLAGS="%{optflags}"
 {%- endif %}
-%py3_build
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python3} setup.py build
+%{?scl:EOF}
 
 %install
-%py3_install
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python3} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%{?scl:EOF}
 
 %clean
 rm -rf %{buildroot}
 
-%files -n python%{python3_pkgversion}-{{ name }}
+%files
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
 {%- for script in scripts %}
-%{_bindir}/{{ script }}3
+%{_bindir}/{{ script }}
 {%- endfor %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
