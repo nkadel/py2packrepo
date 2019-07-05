@@ -27,6 +27,11 @@
 
 %global pypi_name {{ name }}
 
+# Descriptions can get long and clutter .spec file
+%global common_description %{expand:
+{{ description }}
+}
+
 # Common SRPM package
 Name:           python-%{pypi_name}
 Version:        {{ version }}
@@ -41,26 +46,9 @@ Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name};
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
-%if %{with_python2}
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-{%- for req in requires %}
-BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-{%- for req in install_requires %}
-BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-%endif # with_python2
-%if %{with_python3}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-{%- for req in requires %}
-BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-{%- for req in install_requires %}
-BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
-%endif # with_python3
+
+%description
+%blobal common_description
 
 %if %{with_python2}
 %package -n python2-%{pypi_name}
@@ -69,22 +57,24 @@ Release:        0%{?dist}
 Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
-{%- for req in requires %}
-Requires:       python2-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
+
+BuildRequires:  python2-devel
+BuildRequires:  python2-setuptools
 {%- for req in install_requires %}
+BuildRequires:  python2-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+{%- for req in requires %}
 Requires:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
 {%- if extras_require %}
-%if 0%{with_dnf}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
 Suggests:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
-%endif # with_dnf
 {%- endif %}
+%endif # with_dnf
 %{?python_provide:%python_provide python2-%{pypi_name}}
 %endif # with_python2
 
@@ -95,10 +85,11 @@ Release:        0%{?dist}
 Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
-{%- for req in requires %}
-Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
-{%- endfor %}
+
 {%- for req in install_requires %}
+BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+{%- for req in requires %}
 Requires:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
@@ -113,16 +104,14 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 %endif # with_python3
 
-%description
-{{ description }}
-
 %if %{with_python2}
 %description -n python2-%{pypi_name}
-{{ description }}
+%{common_description}
 %endif # with_python2
+
 %if %{with_python3}
 %description -n python%{python3_pkgversion}-%{pypi_name}
-{{ description }}
+%{common_description}
 %endif # with_python3
 
 %prep
