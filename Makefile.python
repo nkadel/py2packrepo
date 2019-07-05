@@ -17,7 +17,7 @@ MOCKS+=fedora-30-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=py2packrepo-7-x86_64
 #MOCKS+=py2packrepo-8-x86_64
-MOCKS+=py2packrepo-f30-x86_64
+#MOCKS+=py2packrepo-f30-x86_64
 
 # Local yum compatible RPM repository
 REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
