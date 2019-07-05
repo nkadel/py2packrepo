@@ -27,11 +27,6 @@
 
 %global pypi_name {{ name }}
 
-# Descriptions can get long and clutter .spec file
-%global common_description %{expand:
-{{ description }}
-}
-
 # Common SRPM package
 Name:           python-%{pypi_name}
 Version:        {{ version }}
