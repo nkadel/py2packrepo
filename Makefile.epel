@@ -11,8 +11,10 @@ RSYNCOPTS=-a --no-owner --no-group
 RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing 
 
 # "mock" configurations to build with, activate only as needed
+MOCKS+=fedora-30-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=epel-7-x86_64
+#MOCKS+=epel-8-x86_64
 
 # Touch these to update repositories
 #MOCKCFGS+=py2packrepo-7-x86_64
@@ -63,9 +65,10 @@ install:: $(MOCKS)
 	    echo Installing $$repo; \
 	    case $$repo in \
 		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
+		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
 		*-30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
 		*-f30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
-		*) echo "Unrecognized relese for $$repo, exiting" >&2; exit 1; ;; \
+		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
 	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
 	    srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \

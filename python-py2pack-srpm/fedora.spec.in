@@ -4,15 +4,15 @@
 # Copyright (c) {{ year }} {{ user_name }}.
 #
 
-# Single python3 version in Fedora, python3_pkgversion macro for EPEL in older RHEL
+# python3_pkgversion macro for EPEL in older RHEL
 %{!?python3_pkgversion:%global python3_pkgversion 3}
 
 # Fedora and RHEL split python2 and python3
 # Older RHEL requires EPEL and python34 or python36
 %global with_python3 1
 
-# Fedora > 30 no longer publishes python2 by default
-%if 0%{?fedora} > 30
+# Fedora >= 38 no longer publishes python2 by default
+%if 0%{?fedora} >= 30
 %global with_python2 0
 %else
 %global with_python2 1
@@ -25,8 +25,10 @@
 %global with_dnf 0
 %endif
 
+%global pypi_name {{ name }}
+
 # Common SRPM package
-Name:           python-{{ name }}
+Name:           python-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -34,7 +36,7 @@ Summary:        {{ summary }}
 License:        {{ license }}
 Group:          Development/Languages/Python
 # Stop using py2pack macros, use local macros published by Fedora
-Source0:        https://files.pythonhosted.org/packages/source/%(n={{ name }}; echo ${n:0:1})/{{ name }}/{{ name }}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name}; echo ${n:0:1})/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 
 {%- if not has_ext_modules %}
 BuildArch:      noarch
@@ -62,7 +64,7 @@ BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 %endif # with_python3
 
 %if %{with_python2}
-%package -n python2-{{ name }}
+%package -n python2-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -76,18 +78,19 @@ Requires:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 %if %{with_dnf}
 {%- if extras_require %}
+%if 0%{with_dnf}
 {%- for reqlist in extras_require.values() %}
 {%- for req in reqlist %}
-Suggests:       python20{{ req|replace('(','')|replace(')','') }}
+Suggests:       python2-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endfor %}
-{%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python2-{{ name }}}
+{%- endif %}
+%{?python_provide:%python_provide python2-%{pypi_name}}
 %endif # with_python2
 
 %if %{with_python3}
-%package -n python%{python3_pkgversion}-{{ name }}
+%package -n python%{python3_pkgversion}-%{pypi_name}
 Version:        {{ version }}
 Release:        0%{?dist}
 Url:            {{ home_page }}
@@ -108,24 +111,23 @@ Suggests:       python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python%{python3_pkgversion}-{{ name }}}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
 %endif # with_python3
 
 %description
 {{ description }}
 
 %if %{with_python2}
-%description -n python2-{{ name }}
+%description -n python2-%{pypi_name}
 {{ description }}
 %endif # with_python2
-
 %if %{with_python3}
-%description -n python%{python3_pkgversion}-{{ name }}
+%description -n python%{python3_pkgversion}-%{pypi_name}
 {{ description }}
 %endif # with_python3
 
 %prep
-%setup -q -n {{ name }}-%{version}
+%setup -q -n %{pypi_name}-%{version}
 
 %build
 {%- if is_extension %}
@@ -134,6 +136,7 @@ export CFLAGS="%{optflags}"
 %if %{with_python2}
 %py2_build
 %endif # with_python2
+
 %if %{with_python3}
 %py3_build
 %endif # with_python3
@@ -141,42 +144,50 @@ export CFLAGS="%{optflags}"
 %install
 %if %{with_python2}
 %py2_install
+{%- if scripts %}
 {%- for script in scripts %}
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/${script} $RPM_BUILD_ROOT%{_bindir}/${script}2
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
 %if ! %{with_python3}
 {%- for script in scripts %}
-%{__ln_s} ${script}2 $RPM_BUILD_ROOT%{_bindir}/${script}
+%{__ln_s} {{ script }}-%{python2_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
 %endif # ! with_python3
+{%- endif %}
 %endif # with_python2
-%if %{with_python3}
 
+%if %{with_python3}
 %py3_install
+{%- if scripts %}
 {%- for script in scripts %}
-%{__mv} $RPM_BUILD_ROOT%{_bindir}/${script} $RPM_BUILD_ROOT%{_bindir}/${script}3
-%{__ln_s} ${script}3 $RPM_BUILD_ROOT%{_bindir}/${script}
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python3_version}
+%{__ln_s} {{ script }}-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 %endif # with_python3
 
 %clean
 rm -rf %{buildroot}
 
 %if %{with_python2}
-%files -n python2-{{ name }}
+%files -n python2-%{pypi_name}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
+{%- if scripts %}
 {%- for script in scripts %}
-%{_bindir}/{{ script }}2
+%{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
+{%- endif %}
 {%- if is_extension %}
 %if ! %{with_python3}
-# Symlinks for binaries renamed to ${script}2, only if with_python3 is not enabled
+{%- if scripts %}
+# Symlinks for binaries to script-2, only if with_python3 is not enabled
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 %endif # with_python3
 %{python2_archlib}/*
 {%- endif %}
@@ -186,17 +197,19 @@ rm -rf %{buildroot}
 %endif # with_python2
 
 %if %{with_python3}
-%files -n python%{python3_pkgversion}-{{ name }}
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %defattr(-,root,root,-)
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
+{%- if scripts %}
 {%- for script in scripts %}
-%{_bindir}/{{ script }}3
+%{_bindir}/{{ script }}-%{python3_version}
 {%- endfor %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
+{%- endif %}
 {%- if is_extension %}
 %{python3_archlib}/*
 {%- endif %}

@@ -1,4 +1,5 @@
 *.log
+*.out
 *.rpm
 *.tar.*
 *.zip
