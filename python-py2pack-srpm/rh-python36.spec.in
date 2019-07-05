@@ -4,9 +4,12 @@
 # Copyright (c) {{ year }} {{ user_name }}.
 #
 
-%{?scl:%scl_package python-six}
-%{!?scl:%global pkg_name %{name}}
+# Mandate scl environment
+%global scl rh-python36
 
+%{?scl:%scl_package python-{{ name }}
+%{!?scl:%global pkg_name %{name}}
+o
 # Older RHEL does not use dnf, does not support "Suggests"
 %if 0%{?fedora} || 0%{?rhel} > 7
 %global with_dnf 1
@@ -15,11 +18,6 @@
 %endif
 
 %global pypi_name {{ name }}
-
-# Descriptions can get long and clutter .spec file
-%global common_description %{expand:
-{{ description }}
-}
 
 # Common SRPM package
 Name:           %{?scl_prefix}python-%{pypi_name}
@@ -35,6 +33,9 @@ Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name};
 {%- if not has_ext_modules %}
 BuildArch:      noarch
 {%- endif %}
+# Force rh-python36 build
+BuildRequires:  rh-python36-build
+
 BuildRequires:  %{?scl_prefix}python-devel
 BuildRequires:  %{?scl_prefix}python-setuptools
 {%- for req in install_requires %}
@@ -55,7 +56,7 @@ Suggests:       %{?scl_prefix}-{{ req|replace('(','')|replace(')','') }}
 %{?python_provide:%python_provide python-%{pypi_name}}
 
 %description
-%blobal common_description
+{{ description }}
 
 %prep
 %setup -q -n %{pypi_name}-%{version}
