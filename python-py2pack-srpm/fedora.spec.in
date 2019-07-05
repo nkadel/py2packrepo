@@ -158,12 +158,10 @@ export CFLAGS="%{optflags}"
 
 %if %{with_python3}
 %py3_install
-{%- if scripts %}
 {%- for script in scripts %}
 %{__mv} $RPM_BUILD_ROOT%{_bindir}/{{ script }} $RPM_BUILD_ROOT%{_bindir}/{{ script }}-%{python3_version}
 %{__ln_s} {{ script }}-%{python3_version} $RPM_BUILD_ROOT%{_bindir}/{{ script }}
 {%- endfor %}
-{%- endif %}
 %endif # with_python3
 
 %clean
@@ -175,19 +173,15 @@ rm -rf %{buildroot}
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
-{%- if scripts %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}-%{python2_version}
 {%- endfor %}
-{%- endif %}
 {%- if is_extension %}
 %if ! %{with_python3}
-{%- if scripts %}
 # Symlinks for binaries to script-2, only if with_python3 is not enabled
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
-{%- endif %}
 %endif # with_python3
 %{python2_archlib}/*
 {%- endif %}
@@ -202,14 +196,12 @@ rm -rf %{buildroot}
 {%- if doc_files %}
 %doc {{ doc_files|join(" ") }}
 {%- endif %}
-{%- if scripts %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}-%{python3_version}
 {%- endfor %}
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
-{%- endif %}
 {%- if is_extension %}
 %{python3_archlib}/*
 {%- endif %}
