@@ -48,7 +48,6 @@ Suggests:       %{?scl_prefix}-{{ req|replace('(','')|replace(')','') }}
 {%- endfor %}
 {%- endif %}
 %endif # with_dnf
-%{?python_provide:%python_provide python-%{pypi_name}}
 
 %description
 {{ description }}
