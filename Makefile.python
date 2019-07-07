@@ -11,11 +11,13 @@ RSYNCOPTS=-a --no-owner --no-group
 RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing 
 
 # "mock" configurations to build with, activate only as needed
-MOCKS+=fedora-29-x86_64
-MOCKS+=fedora-rawhide-x86_64
+MOCKS+=fedora-30-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 #MOCKS+=epel-7-x86_64
+# Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=py2packrepo-7-x86_64
+#MOCKS+=py2packrepo-8-x86_64
+#MOCKS+=py2packrepo-f30-x86_64
 
 # Local yum compatible RPM repository
 REPOBASEDIR="`/bin/pwd | xargs dirname`/py2packrepo"
@@ -28,8 +30,8 @@ PKGNAME := "`ls *.spec | head -1 | sed 's/.spec$$//g'`"
 all:: /usr/bin/createrepo
 all:: $(MOCKS)
 
-# Needed for correct srpm and build format
-#build srpm:: /etc/rpm/macros.python27-config
+getsrc:: FORCE
+	spectool -g $(SPEC)
 
 srpm:: FORCE
 	@echo "Building $(SPEC) SRPM"
@@ -63,11 +65,10 @@ install:: $(MOCKS)
 	    echo Installing $$repo; \
 	    case $$repo in \
 		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
-		*-28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
-		*-29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
-		*-f28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
-		*-f29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
-		*) echo "Unrecognized relese for $$repo, exiting" >&2; exit 1; ;; \
+		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
+		*-30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
+		*-f30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
+		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
 	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
 	    srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \

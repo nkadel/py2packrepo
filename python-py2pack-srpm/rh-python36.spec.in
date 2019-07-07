@@ -1,0 +1,92 @@
+#
+# spec file for package rh-python36-python-{{ name }}
+#
+# Copyright (c) {{ year }} {{ user_name }}.
+#
+
+%global pypi_name {{ name }}
+
+%{?scl:%scl_package python-%{pypi_name}}
+%{!?scl:%global pkg_name python-%{pypi_name}}
+
+# Older RHEL does not use dnf, does not support "Suggests"
+%if 0%{?fedora} || 0%{?rhel} > 7
+%global with_dnf 1
+%else
+%global with_dnf 0
+%endif
+
+# Common SRPM package
+Name:           %{?scl_prefix}python-%{pypi_name}
+Version:        {{ version }}
+Release:        0%{?dist}
+Url:            {{ home_page }}
+Summary:        {{ summary }}
+License:        {{ license }}
+Group:          Development/Languages/Python
+# Stop using py2pack macros, use local macros published by Fedora
+Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name}; echo ${n:0:1})/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+
+{%- if not has_ext_modules %}
+BuildArch:      noarch
+{%- endif %}
+
+BuildRequires:  %{?scl_prefix}python-devel
+BuildRequires:  %{?scl_prefix}python-setuptools
+{%- for req in install_requires %}
+BuildRequires:  %{?scl_prefix}python-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+{%- for req in requires %}
+Requires:       %{?scl_prefix}python-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+%if %{with_dnf}
+{%- if extras_require %}
+{%- for reqlist in extras_require.values() %}
+{%- for req in reqlist %}
+Suggests:       %{?scl_prefix}-{{ req|replace('(','')|replace(')','') }}
+{%- endfor %}
+{%- endfor %}
+{%- endif %}
+%endif # with_dnf
+
+%description
+{{ description }}
+
+%prep
+%setup -q -n %{pypi_name}-%{version}
+
+%build
+{%- if is_extension %}
+export CFLAGS="%{optflags}"
+{%- endif %}
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python3} setup.py build
+%{?scl:EOF}
+
+%install
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python3} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%{?scl:EOF}
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+{%- if doc_files %}
+%doc {{ doc_files|join(" ") }}
+{%- endif %}
+{%- for script in scripts %}
+%{_bindir}/{{ script }}
+{%- endfor %}
+{%- for script in scripts %}
+%{_bindir}/{{ script }}
+{%- endfor %}
+{%- if is_extension %}
+%{python3_archlib}/*
+{%- endif %}
+{%- if not is_extension %}
+%{python3_sitelib}/*
+{%- endif %}
+
+%changelog
