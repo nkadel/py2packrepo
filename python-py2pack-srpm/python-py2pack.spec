@@ -9,7 +9,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.8.4
-Release:        0.2%{?dist}
+Release:        0.3%{?dist}
 Summary:        Generate distribution packages from PyPI
 Group:          Development/Languages/Python
 
@@ -141,6 +141,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Tue Jul 16 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0.3
+- Update rh-python36.spec to use py_build and py_install
+
 * Wed Jul 3 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 0.8.4-0.2
 - Update Source URL
 
