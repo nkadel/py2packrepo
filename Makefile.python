@@ -13,10 +13,10 @@ RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing
 # "mock" configurations to build with, activate only as needed
 MOCKS+=fedora-30-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
-#MOCKS+=epel-7-x86_64
+#MOCKS+=epel-8-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=py2packrepo-7-x86_64
-#MOCKS+=py2packrepo-8-x86_64
+MOCKS+=py2packrepo-8-x86_64
 #MOCKS+=py2packrepo-f30-x86_64
 
 # Local yum compatible RPM repository

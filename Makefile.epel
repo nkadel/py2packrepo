@@ -14,7 +14,7 @@ RSYNCSAFEOPTS=$(RSYNCOPTS) --ignore-existing
 MOCKS+=fedora-30-x86_64
 # Some RHEL dependencies are supplied locally in py2packrepo
 MOCKS+=epel-7-x86_64
-#MOCKS+=epel-8-x86_64
+MOCKS+=epel-8-x86_64
 
 # Touch these to update repositories
 #MOCKCFGS+=py2packrepo-7-x86_64
