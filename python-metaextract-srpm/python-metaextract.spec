@@ -1,6 +1,3 @@
-# Single python3 version in Fedora, python3_pkgversion macro not available
-%{!?python3_pkgversion:%global python3_pkgversion 3}
-
 %global pypi_name metaextract
 
 %global with_python3 1
@@ -12,14 +9,17 @@
 %endif
 
 Name:           python-%{pypi_name}
-Version:        1.0.4
-Release:        0.1%{?dist}
+Version:        1.0.6
+Release:        0%{?dist}
 Summary:        Tool to collect metadata about a python module
 
 License:        BSD
 Source:         http://pypi.python.org/packages/source/m/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
+%if 0%{?rhel}
+BuildRequires:  epel-rpm-macros
+%endif
 
 %description
 metaextract is a tool to collect metadata about a python module. For example
@@ -120,6 +120,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Sat Oct 5 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 1.0.6-0
+- Update to 1.0.6
+
 * Thu May 2 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 1.0.4-0.1
 - Add python3_pkgversion for RHEL
 - Straighten out symlinking for binaries
