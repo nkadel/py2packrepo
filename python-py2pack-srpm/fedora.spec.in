@@ -8,11 +8,11 @@
 %{!?python3_pkgversion:%global python3_pkgversion 3}
 
 # Fedora and RHEL split python2 and python3
-# Older RHEL requires EPEL and python34 or python36
+# RHEL 6 requires python34 from EPEL
 %global with_python3 1
 
-# Fedora >= 38 no longer publishes python2 by default
-%if 0%{?fedora} >= 30
+# Fedora >= 30 no longer publishes python2 by default
+%if 0%{?fedora} >= 30 || 0%{?rhel} >= 8
 %global with_python2 0
 %else
 %global with_python2 1
@@ -168,7 +168,7 @@ rm -rf %{buildroot}
 {%- if is_extension %}
 
 %if ! %{with_python3}
-# Symlinks for binaries to script-2, only if with_python3 is not enabled
+# Symlinks for binaries to script-2, only when with_python3 is not enabled
 {%- for script in scripts %}
 %{_bindir}/{{ script }}
 {%- endfor %}
