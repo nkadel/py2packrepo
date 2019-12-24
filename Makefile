@@ -33,26 +33,24 @@ MOCKCFGS+=fedora-30-x86_64.cfg
 all:: $(CFGS) $(MOCKCFGS)
 all:: $(REPODIRS)
 all:: $(PY2PACKPKGS)
+all:: install
 
-all getsrc install clean:: FORCE
+.PHONY: build getsrc install clean
+build getsrc install clean::
 	@for name in $(PY2PACKPKGS); do \
 	     (cd $$name; $(MAKE) $(MFLAGS) $@); \
 	done  
-
-# Build for locacl OS
-build:: FORCE
-	@for name in $(PY2PACKPKGS); do \
-	     (cd $$name; $(MAKE) $(MFLAGS) $@); \
-	done
 
 # Dependencies
 python-py2pack-srpm:: python-metaextract-srpm
 
 # Actually build in directories
-$(PY2PACKPKGS):: FORCE
+.PHONY: $(PY2PACKPKGS)
+$(PY2PACKPKGS)::
 	(cd $@; $(MAKE) $(MLAGS) install)
 
 repos: $(REPOS) $(REPODIRS)
+.PHONY: $(REPOS)
 $(REPOS):
 	install -d -m 755 $@
 
@@ -60,7 +58,6 @@ $(REPOS):
 $(REPODIRS): $(REPOS)
 	@install -d -m 755 `dirname $@`
 	/usr/bin/createrepo -q `dirname $@`
-
 
 .PHONY: cfg cfgs
 cfg cfgs:: $(CFGS) $(MOCKCFGS)
@@ -120,7 +117,6 @@ py2packrepo-f30-x86_64.cfg: /etc/mock/fedora-30-x86_64.cfg
 $(MOCKCFGS)::
 	ln -sf --no-dereference /etc/mock/$@ $@
 
-
 repo: py2packrepo.repo
 py2packrepo.repo:: Makefile py2packrepo.repo.in
 	if [ -s /etc/fedora-release ]; then \
@@ -144,10 +140,8 @@ clean::
 	    $(MAKE) -C $$name clean; \
 	done
 
-distclean:
+distclean: clean
 	rm -rf $(REPOS)
 
-maintainer-clean:
+maintainer-clean: distclean
 	rm -rf $(PY2PACKPKGS)
-
-FORCE::
