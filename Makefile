@@ -30,9 +30,9 @@ MOCKCFGS+=epel-7-x86_64.cfg
 MOCKCFGS+=epel-8-x86_64.cfg
 MOCKCFGS+=fedora-30-x86_64.cfg
 
-all:: $(CFGS) $(MOCKCFGS)
-all:: $(REPODIRS)
-all:: $(PY2PACKPKGS)
+all:: $(CFGS) $(MOCKCFGS) $(REPODIRS)
+install:: $(CFGS) $(MOCKCFGS) $(REPODIRS)
+install:: $(PY2PACKPKGS)
 all:: install
 
 .PHONY: build getsrc install clean
