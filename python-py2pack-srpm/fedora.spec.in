@@ -88,6 +88,8 @@ Url:            {{ home_page }}
 Summary:        {{ summary }}
 License:        {{ license }}
 
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 # requires stanza of py2pack
 {%- for req in requires %}
 BuildRequires:  python%{python3_pkgversion}-{{ req|replace('(','')|replace(')','') }}
