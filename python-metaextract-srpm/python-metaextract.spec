@@ -14,7 +14,7 @@ Release:        0%{?dist}
 Summary:        Tool to collect metadata about a python module
 
 License:        BSD
-Source:         http://pypi.python.org/packages/source/m/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/%(n=%{pypi_name}; echo ${n:0:1})/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 %if 0%{?rhel}
