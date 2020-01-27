@@ -16,19 +16,19 @@ PY2PACKPKGS+=python-py2pack-srpm
 
 REPOS+=py2packrepo/el/7
 REPOS+=py2packrepo/el/8
-REPOS+=py2packrepo/fedora/30
+REPOS+=py2packrepo/fedora/31
 
 REPODIRS := $(patsubst %,%/x86_64/repodata,$(REPOS)) $(patsubst %,%/SRPMS/repodata,$(REPOS))
 
 # No local dependencies at build time
 CFGS+=py2packrepo-7-x86_64.cfg
 CFGS+=py2packrepo-8-x86_64.cfg
-CFGS+=py2packrepo-f30-x86_64.cfg
+CFGS+=py2packrepo-f31-x86_64.cfg
 
 # Link from /etc/mock
 MOCKCFGS+=epel-7-x86_64.cfg
 MOCKCFGS+=epel-8-x86_64.cfg
-MOCKCFGS+=fedora-30-x86_64.cfg
+MOCKCFGS+=fedora-31-x86_64.cfg
 
 all:: $(CFGS) $(MOCKCFGS) $(REPODIRS)
 install:: $(CFGS) $(MOCKCFGS) $(REPODIRS)
@@ -96,16 +96,16 @@ py2packrepo-8-x86_64.cfg: /etc/mock/epel-8-x86_64.cfg
 	@echo '#cost=2000' >> $@
 	@echo '"""' >> $@
 
-py2packrepo-f30-x86_64.cfg: /etc/mock/fedora-30-x86_64.cfg
+py2packrepo-f31-x86_64.cfg: /etc/mock/fedora-31-x86_64.cfg
 	@echo Generating $@ from $?
 	@cat $? > $@
-	@sed -i 's/fedora-30-x86_64/py2packrepo-f30-x86_64/g' $@
+	@sed -i 's/fedora-31-x86_64/py2packrepo-f31-x86_64/g' $@
 	@echo >> $@
 	@echo "config_opts['yum.conf'] += \"\"\"" >> $@
 	@echo '[py2packrepo]' >> $@
 	@echo 'name=py2packrepo' >> $@
 	@echo 'enabled=1' >> $@
-	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/30/x86_64/' >> $@
+	@echo 'baseurl=file://$(PWD)/py2packrepo/fedora/31/x86_64/' >> $@
 	@echo 'failovermethod=priority' >> $@
 	@echo 'skip_if_unavailable=False' >> $@
 	@echo 'metadata_expire=1' >> $@
